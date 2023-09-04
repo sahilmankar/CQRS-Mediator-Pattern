@@ -1,7 +1,9 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Users.Contexts;
 using Users.Entities;
+using Users.Queries;
 
 namespace Users.Controllers;
 
@@ -9,16 +11,18 @@ namespace Users.Controllers;
 [Route("/api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly UserContext _context;
+    private readonly IMediator _mediator;
 
-    public UsersController(UserContext context)
+    public UsersController(IMediator mediator)
     {
-        _context = context;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<User>> GetUsers()
+    public async Task<ActionResult> GetUsers(CancellationToken cancellationToken )
     {
-        return await _context.Users.ToListAsync();
+        var users = await _mediator.Send(new GetUsersQuery(),cancellationToken);
+
+        return Ok(users);
     }
 }

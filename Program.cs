@@ -14,6 +14,7 @@ options.UseMySQL(  builder.Configuration.GetConnectionString("DefaultConnection"
             .LogTo(Console.WriteLine, LogLevel.Information);
     }
 );
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
    
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
