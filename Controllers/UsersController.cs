@@ -1,7 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Users.Contexts;
 using Users.Entities;
 using Users.Queries;
 
@@ -19,10 +17,26 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetUsers(CancellationToken cancellationToken )
+    public async Task<ActionResult> GetUsers(CancellationToken cancellationToken)
     {
-        var users = await _mediator.Send(new GetUsersQuery(),cancellationToken);
+        var users = await _mediator.Send(new GetUsersQuery(), cancellationToken);
+        return users is not null ? Ok(users) : NotFound();
+    }
 
-        return Ok(users);
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult> GetUserById(int id, CancellationToken cancellationToken)
+    {
+        var user = await _mediator.Send(new GetUserByIdQuery(id), cancellationToken);
+        return user is not null ? Ok(user) : NotFound();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> CreateUser(
+        [FromBody] User user,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await _mediator.Send(new CreateUserCommand(user), cancellationToken);
+        return Ok(result);
     }
 }
